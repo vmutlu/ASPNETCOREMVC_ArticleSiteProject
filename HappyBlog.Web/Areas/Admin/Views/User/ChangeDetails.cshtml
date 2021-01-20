@@ -1,0 +1,61 @@
+﻿@model HappyBlog.Entities.DTOs.UserUpdateDTO
+
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Profil Düzenle";
+}
+
+<div class="row">
+    <div class="col-lg-6 offset-lg-3">
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4 class="text-center"><span class="fas fa-edit"></span> Profil Düzenle</h4>
+            </div>
+            <div class="card-body">
+                <form asp-controller="User" enctype="multipart/form-data" asp-action="ChangeDetails" method="post" id="form-user-update">
+
+                    <div asp-validation-summary="All" class="text-danger" id="validation-summary"></div>
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group">
+                        <label asp-for="UserName"></label>
+                        <input class="form-control" asp-for="UserName" placeholder="Kullanıcı Adı Giriniz..." />
+                        <span class="text-danger" asp-validation-for="UserName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email"></label>
+                        <input class="form-control" asp-for="Email" placeholder="E-mail Adresi Giriniz..." type="email" />
+                        <span class="text-danger" asp-validation-for="Email"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber"></label>
+                        <input class="form-control" asp-for="PhoneNumber" type="text" placeholder="Telefon No Giriniz..." />
+                        <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Picture"></label>
+                        <input type="hidden" asp-for="Picture" />
+                        <img class="my-image" src="~/img/@Model.Picture" alt="@Model.UserName" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PictureFile"></label>
+                        <input class="form-control-file" type="file" accept="image/*" asp-for="PictureFile" />
+                        <span class="text-danger" asp-validation-for="PictureFile"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block"><span class="fas fa-save"></span> Kaydet</button>
+
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="btn btn-danger btn-block"><span class="fas fa-times"></span> İptal</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
