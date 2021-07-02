@@ -12,26 +12,20 @@ using System.Threading.Tasks;
 namespace HappyBlog.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles ="Admin,Editor")]
+    [Authorize(Roles = "Admin,Editor")]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
-        public CategoryController(ICategoryService categoryService)
-        {
-            _categoryService = categoryService;
-        }
+        public CategoryController(ICategoryService categoryService) => _categoryService = categoryService;
         public async Task<IActionResult> Index()
         {
-            var result = await _categoryService.GetAllByNonDeletedAsync();
+            var result = await _categoryService.GetAllByNonDeletedAsync().ConfigureAwait(false);
 
             return View(result.Data);
         }
 
         [HttpGet]
-        public IActionResult Add()
-        {
-            return PartialView("_CategoryAddPartial");
-        }
+        public IActionResult Add() => PartialView("_CategoryAddPartial");
 
         [HttpPost]
         public async Task<IActionResult> Add(CategoryAddDTO categoryAddDTO)
@@ -112,7 +106,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Delete(int categoryId)
         {
-            var result = await _categoryService.DeleteAsync(categoryId, "Veyseel MUTLU");
+            var result = await _categoryService.DeleteAsync(categoryId, "Veyseel MUTLU").ConfigureAwait(false);
 
             var ajaxResult = JsonSerializer.Serialize(result.Data);
             return Json(ajaxResult);

@@ -5,14 +5,12 @@ using HappyBlog.Shared.Utilities.Extensions;
 using HappyBlog.Shared.Utilities.Results.ComplexTypes;
 using HappyBlog.Web.Areas.Admin.Models;
 using HappyBlog.Web.Helpers.Abstract;
-using HappyBlog.Web.Helpers.Concrate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -39,7 +37,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.Users.ToListAsync().ConfigureAwait(false);
             return View(new UserListDTO
             {
                 Users = users,
@@ -48,25 +46,19 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public ViewResult AccessDenied()
-        {
-            return View();
-        }
+        public ViewResult AccessDenied() => View();
 
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync().ConfigureAwait(false); ;
 
             return RedirectToAction("Index", "Home", new { Area = "" });
         }
 
         [HttpGet]
-        public IActionResult UserLogin()
-        {
-            return View();
-        }
+        public IActionResult UserLogin() => View();
 
         [HttpPost]
         public async Task<IActionResult> UserLogin(UserLoginDTO userLoginDTO)
@@ -103,7 +95,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         [HttpGet]
         public async Task<JsonResult> GetAllUsers()
         {
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.Users.ToListAsync().ConfigureAwait(false); ;
 
             var userListDTO = JsonSerializer.Serialize(new UserListDTO
             {
@@ -122,8 +114,8 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Delete(int userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            var result = await _userManager.DeleteAsync(user);
+            var user = await _userManager.FindByIdAsync(userId.ToString()).ConfigureAwait(false); ;
+            var result = await _userManager.DeleteAsync(user).ConfigureAwait(false); ;
 
             if (result.Succeeded)
             {
@@ -158,7 +150,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         [HttpGet]
         public async Task<PartialViewResult> Update(int userId)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false); ;
             var userUpdateDTO = _mapper.Map<UserUpdateDTO>(user);
 
             return PartialView("_UserUpdatePartial", userUpdateDTO);
@@ -175,7 +167,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 var oldUserPicture = oldUser.Picture;
                 if (userUpdateDTO.PictureFile != null)
                 {
-                    var uploadedImageDTOResult = await _imageHelper.UploadedUserImage(userUpdateDTO.UserName, userUpdateDTO.PictureFile);
+                    var uploadedImageDTOResult = await _imageHelper.UploadedUserImage(userUpdateDTO.UserName, userUpdateDTO.PictureFile).ConfigureAwait(false); ;
                     userUpdateDTO.Picture = uploadedImageDTOResult.ResultStatus == ResultStatus.Success ? uploadedImageDTOResult.Data.FullName : "userImages/default.png";
 
                     if (oldUserPicture != "userImages/default.png")
@@ -183,14 +175,13 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 }
 
                 var updatedUser = _mapper.Map<UserUpdateDTO, User>(userUpdateDTO, oldUser);
-                var result = await _userManager.UpdateAsync(updatedUser);
+                var result = await _userManager.UpdateAsync(updatedUser).ConfigureAwait(false); ;
 
                 if (result.Succeeded)
                 {
                     if (isNewPictureUploaded)
-                    {
                         _imageHelper.Delete(oldUserPicture);
-                    }
+
                     var userUpdateViewModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
                     {
                         UserDTO = new UserDTO
@@ -208,9 +199,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 else
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError("", error.Description);
-                    }
 
                     var userUpdateViewModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
                     {
@@ -237,10 +226,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public IActionResult Add()
-        {
-            return PartialView("_UserAddPartial");
-        }
+        public IActionResult Add() => PartialView("_UserAddPartial");
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -248,11 +234,11 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var uploadedImageDTOResult = await _imageHelper.UploadedUserImage(userAddDTO.UserName, userAddDTO.PictureFile);
+                var uploadedImageDTOResult = await _imageHelper.UploadedUserImage(userAddDTO.UserName, userAddDTO.PictureFile).ConfigureAwait(false); ;
                 userAddDTO.Picture = uploadedImageDTOResult.ResultStatus == ResultStatus.Success ? uploadedImageDTOResult.Data.FullName : "userImages/default.png";
 
                 var user = _mapper.Map<User>(userAddDTO);
-                var result = await _userManager.CreateAsync(user, userAddDTO.Password);
+                var result = await _userManager.CreateAsync(user, userAddDTO.Password).ConfigureAwait(false); ;
 
                 if (result.Succeeded)
                 {
@@ -273,9 +259,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 else
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError("", error.Description);
-                    }
 
                     var userAddAjaxErrorModel = JsonSerializer.Serialize(new UserAddAjaxViewModel
                     {
@@ -300,7 +284,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         [HttpGet]
         public async Task<ViewResult> ChangeDetails()
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(HttpContext.User).ConfigureAwait(false); ;
             var updateDTO = _mapper.Map<UserUpdateDTO>(user);
             return View(updateDTO);
         }
@@ -316,7 +300,7 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 var oldUserPicture = oldUser.Picture;
                 if (userUpdateDTO.PictureFile != null)
                 {
-                    var uploadedImageDTOResult = await _imageHelper.UploadedUserImage(userUpdateDTO.UserName, userUpdateDTO.PictureFile);
+                    var uploadedImageDTOResult = await _imageHelper.UploadedUserImage(userUpdateDTO.UserName, userUpdateDTO.PictureFile).ConfigureAwait(false); ;
                     userUpdateDTO.Picture = uploadedImageDTOResult.ResultStatus == ResultStatus.Success ? uploadedImageDTOResult.Data.FullName : "userImages/default.png";
 
                     if (oldUserPicture != "userImages/default.png")
@@ -324,14 +308,12 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 }
 
                 var updatedUser = _mapper.Map<UserUpdateDTO, User>(userUpdateDTO, oldUser);
-                var result = await _userManager.UpdateAsync(updatedUser);
+                var result = await _userManager.UpdateAsync(updatedUser).ConfigureAwait(false); ;
 
                 if (result.Succeeded)
                 {
                     if (isNewPictureUploaded)
-                    {
                         _imageHelper.Delete(oldUserPicture);
-                    }
 
                     TempData.Add("SuccessMessage", $"{updatedUser.UserName} adlı kullanıcı başarıyla güncellenmiştir.");
                     return View(userUpdateDTO);
@@ -340,26 +322,19 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
                 else
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError("", error.Description);
-                    }
 
                     return View(userUpdateDTO);
                 }
             }
 
             else
-            {
                 return View(userUpdateDTO);
-            }
         }
 
         [Authorize]
         [HttpGet]
-        public ViewResult PasswordChange()
-        {
-            return View();
-        }
+        public ViewResult PasswordChange() => View();
 
         [Authorize]
         [HttpPost]
@@ -367,18 +342,18 @@ namespace HappyBlog.Web.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User).ConfigureAwait(false); ;
                 if (user != null)
                 {
-                    var isVerify = await _userManager.CheckPasswordAsync(user, userPasswordChangeDTO.CurrentPassword);
+                    var isVerify = await _userManager.CheckPasswordAsync(user, userPasswordChangeDTO.CurrentPassword).ConfigureAwait(false); ;
 
                     if (isVerify)
                     {
-                        var result = await _userManager.ChangePasswordAsync(user, userPasswordChangeDTO.CurrentPassword, userPasswordChangeDTO.NeWPassword);
+                        var result = await _userManager.ChangePasswordAsync(user, userPasswordChangeDTO.CurrentPassword, userPasswordChangeDTO.NeWPassword).ConfigureAwait(false); ;
                         if (result.Succeeded)
                         {
-                            await _userManager.UpdateSecurityStampAsync(user);
-                            await _signInManager.SignOutAsync();
+                            await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(false); ;
+                            await _signInManager.SignOutAsync().ConfigureAwait(false); ;
 
                             await _signInManager.PasswordSignInAsync(user, userPasswordChangeDTO.NeWPassword, true, false); // şifre değiştirme başarılıysa çıkış yapıp tekrar giriş yaptırdım.
 
