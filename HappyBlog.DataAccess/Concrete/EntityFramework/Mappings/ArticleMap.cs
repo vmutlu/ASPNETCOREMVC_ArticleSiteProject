@@ -1,7 +1,6 @@
 ﻿using HappyBlog.Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace HappyBlog.DataAccess.Concrete.EntityFramework.Mappings
 {

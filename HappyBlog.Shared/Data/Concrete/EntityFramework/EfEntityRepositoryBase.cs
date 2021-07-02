@@ -12,10 +12,8 @@ namespace HappyBlog.Shared.Data.Concrete.EntityFramework
     public class EfEntityRepositoryBase<T> : IEntityRepository<T> where T : class, IEntity, new()
     {
         protected readonly DbContext _dbContext;
-        public EfEntityRepositoryBase(DbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public EfEntityRepositoryBase(DbContext dbContext) => _dbContext = dbContext;
+
         public async Task<T> AddAsync(T entity)
         {
             await _dbContext.Set<T>().AddAsync(entity).ConfigureAwait(false);
@@ -23,20 +21,11 @@ namespace HappyBlog.Shared.Data.Concrete.EntityFramework
             return entity;
         }
 
-        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbContext.Set<T>().AnyAsync(predicate).ConfigureAwait(false);
-        }
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate) => await _dbContext.Set<T>().AnyAsync(predicate).ConfigureAwait(false);
 
-        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate = null)
-        {
-            return predicate == null ? await _dbContext.Set<T>().CountAsync() : await _dbContext.Set<T>().CountAsync(predicate).ConfigureAwait(false);
-        }
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate = null) => predicate == null ? await _dbContext.Set<T>().CountAsync() : await _dbContext.Set<T>().CountAsync(predicate).ConfigureAwait(false);
 
-        public async Task DeleteAsync(T entity)
-        {
-            await Task.Run(() => { _dbContext.Set<T>().Remove(entity); });
-        }
+        public async Task DeleteAsync(T entity) => await Task.Run(() => { _dbContext.Set<T>().Remove(entity); });
 
         public async Task<IList<T>> GetAllAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties)
         {

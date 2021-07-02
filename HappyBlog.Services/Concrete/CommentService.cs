@@ -10,10 +10,7 @@ namespace HappyBlog.Services.Concrete
     public class CommentService : ICommentService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public CommentService(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        public CommentService(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
         public async Task<IDataResult<int>> CountAsync()
         {

@@ -13,10 +13,7 @@ namespace HappyBlog.DataAccess.Concrete.EntityFramework.Repositories
         {
         }
 
-        public async Task<Category> GetById(int categoryId)
-        {
-           return await happyBlogContext.Categories.SingleOrDefaultAsync(c => c.Id == categoryId);
-        } 
+        public async Task<Category> GetById(int categoryId) => await happyBlogContext.Categories.SingleOrDefaultAsync(c => c.Id == categoryId);
 
         private HappyBlogContext happyBlogContext
         {

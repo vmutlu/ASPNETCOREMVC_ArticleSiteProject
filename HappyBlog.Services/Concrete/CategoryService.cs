@@ -22,30 +22,8 @@ namespace HappyBlog.Services.Concrete
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// Verilen CategoryAddDTO ve CreatedByName parametrelerine ait bilgiler ile yeni bir Category ekler.
-        /// </summary>
-        /// <param name="categoryAddDTO">categoryAddDTO tipinde eklenecek kategori bilgileri</param>
-        /// <param name="createdByName">string tipinde kullanıcı Adı</param>
-        /// <returns> Asenkron bir operasyon ile Task olarak işlemin sonucunu DataResult tipinde döner.</returns>
         public async Task<IDataResult<CategoryDTO>> AddAsync(CategoryAddDTO categoryAddDTO, string createdByName)
         {
-            // Manuel Mapleme
-
-            //await _unitOfWork.Categories.AddAsync(
-            //    new Category
-            //    {
-            //        Name = categoryAddDTO.Name,
-            //        Description = categoryAddDTO.Description,
-            //        Note = categoryAddDTO.Note,
-            //        IsActive = categoryAddDTO.IsActive,
-            //        CreatedByName = createdByName,
-            //        CreatedDate = DateTime.Now,
-            //        ModifiedByName = createdByName,
-            //        ModifiedDate = DateTime.Now,
-            //        IsDeleted = false
-            //    }).ContinueWith(t => _unitOfWork.SaveAsync());// işlemi bitirip anında kaydetcek çok hızlı bir işlem olacak.
-
             var category = _mapper.Map<Category>(categoryAddDTO);
             category.CreatedByName = createdByName;
             category.ModifiedByName = createdByName;
@@ -183,11 +161,6 @@ namespace HappyBlog.Services.Concrete
                 return new DataResult<CategoryListDTO>(ResultStatus.Error, Messages.Category.NotFound(isPlural: true), null);
         }
 
-        /// <summary>
-        /// Verilen Id parametresine ait kategorinin CategoryUpdateDTO temsilini geri döner.
-        /// </summary>
-        /// <param name="categoryId"> 0'dan büyük int Id degeri</param>
-        /// <returns>Asenkron bir operasyon ile Task olarak işlem sonucu DataResult tipinde geriye döner</returns>
         public async Task<IDataResult<CategoryUpdateDTO>> GetCategoryUpdateAsync(int categoryId)
         {
             var result = await _unitOfWork.Categories.AnyAsync(c => c.Id == categoryId);
@@ -221,16 +194,6 @@ namespace HappyBlog.Services.Concrete
 
         public async Task<IDataResult<CategoryDTO>> UpdateAsync(CategoryUpdateDTO categoryUpdateDTO, string modifiedByName)
         {
-            // Manuel Mapleme
-
-            //category.Name = categoryUpdateDTO.Name;
-            //category.Description = categoryUpdateDTO.Description;
-            //category.Note = categoryUpdateDTO.Note;
-            //category.IsActive = categoryUpdateDTO.IsActive;
-            //category.IsDeleted = categoryUpdateDTO.IsDeleted;
-            //category.ModifiedByName = modifiedByName;
-            //category.ModifiedDate = DateTime.Now;
-
             var oldCategory = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryUpdateDTO.Id);
             var category = _mapper.Map<CategoryUpdateDTO, Category>(categoryUpdateDTO, oldCategory);
             category.ModifiedByName = modifiedByName;
